@@ -11,6 +11,4 @@ MIT.
 ToDo
 =======================
 
-synch github editor
-
 change editor setting

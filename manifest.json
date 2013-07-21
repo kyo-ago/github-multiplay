@@ -10,6 +10,7 @@
             "/lib/codemirror/codemirror.css"
         ],
 		"js" : [
+            "/lib/Deferred.js",
             "/lib/codemirror/codemirror.js",
             "/lib/firepad/firebase.js",
             "/lib/firepad/firepad-min.js",
@@ -17,8 +18,7 @@
 		]
 	}],
     "web_accessible_resources" : [
-        "/lib/*",
-        "/lib/**/*"
+        "js/inner.js"
     ],
 	"icons": {
 		"48": "/img/icon48.png"

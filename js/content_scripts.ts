@@ -3,16 +3,54 @@
  */
 /// <reference path="../typings/chrome.d.ts" />
 /// <reference path="../typings/codemirror.d.ts" />
+/// <reference path="../typings/jsdeferred.d.ts" />
 declare var Firebase;
 declare var Firepad;
 declare var editor;
+
+var target = <HTMLElement>document.querySelector('.js-commit-create');
+var defer = new Deferred();
 (() => {
-    var target = <HTMLElement>document.querySelector('.js-commit-create');
     if (!target) {
         return;
     }
+
+    var scp = document.createElement('script');
+    scp.src = (<any>chrome.extension).getURL('/js/inner.js');
+    document.body.appendChild(scp);
+
+    var tab = <HTMLElement>document.querySelector('.edit-preview-tabs');
+    tab.insertAdjacentHTML('BeforeEnd', '<li><a href="#" class="multiplay minibutton">Multiplay</a></li>');
+    tab.lastElementChild.querySelector('a').addEventListener('click', defer.call.bind(defer), true);
+    [].slice.apply(tab.querySelectorAll('a')).forEach((elem, idx) => {
+        elem.dataset['index'] = idx;
+    });
+    tab.addEventListener('click', (evn) => {
+        evn.preventDefault();
+        var current:any = <HTMLElement>tab.querySelector('.selected');
+        current.classList.remove('selected');
+        var src:any = <HTMLElement>evn.srcElement;
+        src.classList.add('selected');
+
+        var js_commit = document.querySelectorAll('.js-commit-create, .js-commit-multiplay, .js-commit-preview');
+        (<HTMLElement>js_commit[current.dataset['index']]).style.position = 'absolute';
+        (<HTMLElement>js_commit[src.dataset['index']]).style.position = '';
+
+        if (src.classList.contains('code')) {
+            postMessage({
+                'type' : 'update'
+            }, location.href);
+        }
+    });
+})();
+
+defer.next(() => {
+    if (document.querySelector('.github-multiplay'))
+        return;
+
     var div = document.createElement('div');
-    div.classList.add('js-commit-create');
+    div.classList.add('js-commit-multiplay');
+    div.classList.add('github-multiplay');
 
     var base_url = (<String>location.href).replace(/[\W_]/g, (char) => {
         return '_' + char.charCodeAt(0).toString(16).toUpperCase();
@@ -23,7 +61,6 @@ declare var editor;
         'lineWrapping' : true
     });
     target.insertAdjacentElement('afterEnd', div);
-    target.style.display = 'none';
 
     var firepad = Firepad.fromCodeMirror(firepadRef, codeMirror);
     firepad.on('ready', () => {
@@ -32,11 +69,10 @@ declare var editor;
             firepad.setText(textarea.value);
         }
         codeMirror.on('change', () => {
-            var ace = <HTMLTextAreaElement>document.querySelector('textarea.ace_text-input');
-            var event:any = document.createEvent('TextEvent');
-            ace.value = firepad.getText();
-            event.initTextEvent('textInput', true, false, <AbstractView>window, 'a', 0x09, 'ja');
-            ace.dispatchEvent(event);
+            postMessage({
+                'type' : 'setValue',
+                'value' : firepad.getText()
+            }, location.href);
         });
     });
-})();
+});

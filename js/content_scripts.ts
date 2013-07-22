@@ -74,5 +74,6 @@ defer.next(() => {
                 'value' : firepad.getText()
             }, location.href);
         });
+        codeMirror.scrollTo(0, 0);
     });
 });

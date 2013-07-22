@@ -64,6 +64,7 @@ defer.next(function () {
                 'value': firepad.getText()
             }, location.href);
         });
+        codeMirror.scrollTo(0, 0);
     });
 });
 //@ sourceMappingURL=content_scripts.js.map

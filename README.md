@@ -1,7 +1,7 @@
 github-multiplay
 =======================
 
-firepad on github.
+Google Drive Realtime API on github.
 
 Chrome Webstore
 =======================
@@ -16,8 +16,4 @@ MIT.
 ToDo
 =======================
 
-Change editor setting.
-
-Improve UI.
-
-Change firebase URL.
+Many bugfixes.

@@ -1,26 +1,18 @@
 {
 	"name": "github-multiplay",
-	"description": "firepad on github",
+	"description": "Google Drive Realtime API on github",
 	"manifest_version": 2,
 	"version": "0.1",
+    "icons": {
+        "48": "/img/icon48.png"
+    },
 	"content_scripts" : [{
 		"matches" : ["https://github.com/*/edit/*"],
-        "css" : [
-            "/lib/firepad/firepad.css",
-            "/lib/codemirror/codemirror.css"
-        ],
 		"js" : [
-            "/lib/Deferred.js",
-            "/lib/codemirror/codemirror.js",
-            "/lib/firepad/firebase.js",
-            "/lib/firepad/firepad-min.js",
             "/js/content_scripts.js"
 		]
 	}],
     "web_accessible_resources" : [
-        "js/inner.js"
-    ],
-	"icons": {
-		"48": "/img/icon48.png"
-	}
+        "/web_accessible_resources/inner.js"
+    ]
 }

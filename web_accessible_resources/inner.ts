@@ -28,9 +28,9 @@ var addEditor = (callback) => {
     div.classList.add('github-multiplay');
 
     var iframe = document.createElement('iframe');
-    iframe.src = 'http://jsrun.it/kyo_ago/github-multiplay-editor' + location.hash;
+    iframe.src = 'http://kyo-ago.github.io/github-multiplay/editor.html' + location.hash;
     iframe.style.width = '100%';
-    iframe.style.height = '100%';
+    iframe.style.height = document.getElementById('ace-editor').style.height;
     iframe.style.margin = '0px 0px -5px 0px';
     div.appendChild(iframe);
     iframe.addEventListener('load', callback, false);
@@ -41,7 +41,7 @@ var addEditor = (callback) => {
 var exchangeMessage = function () {
     var contentWindow = this.contentWindow;
     var post = (data) => {
-        contentWindow.postMessage(data, 'http://jsrun.it');
+        contentWindow.postMessage(data, 'http://kyo-ago.github.io');
     };
     post({
         'type' : 'load',

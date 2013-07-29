@@ -1,12 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8" /><title>github-multiplay editor - js do it</title>
-<meta name="Description" content="jsdo.it - share JavaScript, HTML5 and CSS - " />
-<meta name="Keywords"  content="JavaScript,HTML5,CSS" />
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
-
-<style type="text/css">
+<meta charset="UTF-8" />
+<title>github-multiplay editor</title>
+<style>
     * {
         margin: 0;
         padding: 0;
@@ -17,12 +14,15 @@
     }
     textarea {
         overflow: auto;
-        margin: 5px 0px 0px 1px;
     }
-</style></head>
+</style>
+<script src="https://raw.github.com/ajaxorg/ace-builds/master/src-min/ace.js"></script>
+</head>
 <body>
-<textarea id="multiplayEditor"></textarea>
-<script type="text/javascript">
+<div id="multiplayEditor"></div>
+<script>
+var editor = ace.edit('multiplayEditor');
+
 addEventListener('message', function (evn) {
     if (evn.origin !== 'https://github.com') {
         return;
@@ -40,7 +40,7 @@ var handlers = {
     'setValue' : function (evn) {
         var fromParent = evn['data'];
         var multiplayEditor = document.getElementById('multiplayEditor');
-        multiplayEditor.value = fromParent['value'];
+        editor.setCode(fromParent['value']);
     },
     'load' : function (evn) {
         var fromParent = evn['data'];
@@ -49,29 +49,28 @@ var handlers = {
         var scp = document.createElement('script');
         scp.src = 'https://apis.google.com/js/api.js';
         document.head.appendChild(scp);
-        var multiplayEditor = document.getElementById('multiplayEditor');
-        multiplayEditor['value'] = fromParent['value'];
+        editor.setCode(fromParent['value']);
         scp.addEventListener('load', function () {
             RealtimeAPI({
                 'fileLoaded' : function (doc) {
                     var string = doc.getModel().getRoot().get('text');
                     var updateText = function (evn) {
                         var value = string + '';
-                        multiplayEditor['value'] = value;
+                        editor.setCode(fromParent['value']);
                         receiveMessage({
                             'type' : 'setValue',
                             'value' : value
                         });
                     };
-                    multiplayEditor.addEventListener('keypress', function (evn) {
-                        string.setText(multiplayEditor['value']);
+                    editor.on('change', function () {
+                        string.setText(editor.code());
                     });
                     string.addEventListener(gapi.drive.realtime.EventType.TEXT_INSERTED, updateText);
                     string.addEventListener(gapi.drive.realtime.EventType.TEXT_DELETED, updateText);
                     updateText({});
                 },
                 'initializeModel' : function (model) {
-                    var string = model.createString(multiplayEditor['value']);
+                    var string = model.createString(editor.code());
                     model.getRoot().set('text', string);
                 },
                 'updateHash' : function (hash) {
@@ -232,7 +231,6 @@ var RealtimeAPI = (function () {
     };
     return self;
 })();
-
 </script>
 </body>
 </html>

@@ -39,8 +39,7 @@ var handlers = {
     },
     'setValue' : function (evn) {
         var fromParent = evn['data'];
-        var multiplayEditor = document.getElementById('multiplayEditor');
-        editor.setCode(fromParent['value']);
+        editor.setValue(fromParent['value']);
     },
     'load' : function (evn) {
         var fromParent = evn['data'];
@@ -49,28 +48,28 @@ var handlers = {
         var scp = document.createElement('script');
         scp.src = 'https://apis.google.com/js/api.js';
         document.head.appendChild(scp);
-        editor.setCode(fromParent['value']);
+        editor.setValue(fromParent['value']);
         scp.addEventListener('load', function () {
             RealtimeAPI({
                 'fileLoaded' : function (doc) {
                     var string = doc.getModel().getRoot().get('text');
                     var updateText = function (evn) {
                         var value = string + '';
-                        editor.setCode(fromParent['value']);
+                        editor.setValue(fromParent['value']);
                         receiveMessage({
                             'type' : 'setValue',
                             'value' : value
                         });
                     };
                     editor.on('change', function () {
-                        string.setText(editor.code());
+                        string.setText(editor.getValue());
                     });
                     string.addEventListener(gapi.drive.realtime.EventType.TEXT_INSERTED, updateText);
                     string.addEventListener(gapi.drive.realtime.EventType.TEXT_DELETED, updateText);
                     updateText({});
                 },
                 'initializeModel' : function (model) {
-                    var string = model.createString(editor.code());
+                    var string = model.createString(editor.getValue());
                     model.getRoot().set('text', string);
                 },
                 'updateHash' : function (hash) {

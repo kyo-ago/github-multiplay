@@ -4,15 +4,25 @@
 <meta charset="UTF-8" />
 <title>github-multiplay editor</title>
 <style>
+    html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
     #multiplayEditor {
+        width: 100%;
+        height: 100%;
     }
 </style>
-<script src="./ace.js"></script>
+<script src="./ace-src-min/ace.js"></script>
 </head>
 <body>
 <div id="multiplayEditor"></div>
 <script>
 var editor = ace.edit('multiplayEditor');
+editor.setTheme("ace/theme/monokai");
+editor.getSession().setMode("ace/mode/javascript");
 
 addEventListener('message', function (evn) {
     if (evn.origin !== 'https://github.com') {

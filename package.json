@@ -1,0 +1,9 @@
+{
+  "name": "github-multiplay",
+  "version": "0.0.1",
+  "devDependencies": {
+    "grunt": "latest",
+    "grunt-contrib-watch": "latest",
+    "grunt-typescript": "latest"
+  }
+}

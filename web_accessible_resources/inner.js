@@ -38,9 +38,13 @@ var exchangeMessage = function () {
     var post = function (data) {
         contentWindow.postMessage(data, 'http://kyo-ago.github.io');
     };
+    var editorSession = (editor.ace).getSession();
     post({
         'type': 'load',
         'clientId': '629725110204.apps.googleusercontent.com',
+        'mode': editorSession.getMode().$id,
+        'options': editorSession.getOptions(),
+        'theme': 'ace/theme/textmate',
         'value': editor.code()
     });
     var handlers = {
@@ -59,7 +63,7 @@ var exchangeMessage = function () {
         var handler = handlers[data['type']];
         handler && handler(data);
     }, false);
-    (editor.ace).getSession().on('change', function () {
+    editorSession.on('change', function () {
         post({
             'type': 'setValue',
             'value': editor.code()

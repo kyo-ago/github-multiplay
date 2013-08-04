@@ -1,11 +1,15 @@
-/// <reference path="../typings/ace.d.ts" />
+/// <reference path="../typings/codemirror.d.ts" />
 
 declare var RealtimeAPI;
 declare var gapi;
 
-var editor = ace.edit('multiplayEditor');
-editor.setTheme("ace/theme/monokai");
-editor.getSession().setMode("ace/mode/javascript");
+var editor = CodeMirror(document.getElementById('multiplayEditor'), {
+    'mode' : 'gfm',
+    'lineNumbers' : true,
+    'lineWrapping' : true,
+    'readOnly' : true
+});
+var doc = editor.getDoc();
 
 addEventListener('message', function (evn) {
     if (evn.origin !== 'https://github.com') {
@@ -23,7 +27,7 @@ var handlers = {
     },
     'setValue' : function (evn) {
         var fromParent = evn['data'];
-        editor.setValue(fromParent['value']);
+        doc.setValue(fromParent['value']);
     },
     'load' : function (evn) {
         var fromParent = evn['data'];
@@ -33,34 +37,57 @@ var handlers = {
         scp.src = 'https://apis.google.com/js/api.js';
         document.head.appendChild(scp);
 
-        editor.setValue(fromParent['value']);
-        editor.setTheme(fromParent['theme']);
-
-        var session = editor.getSession();
-        session.setMode(fromParent['mode']);
-        (<any>session).setOptions(fromParent['options']);
+        doc.setValue(fromParent['value']);
 
         scp.addEventListener('load', function () {
             RealtimeAPI({
                 'fileLoaded' : function (doc) {
+                    editor.setOption('readOnly', false);
                     var string = doc.getModel().getRoot().get('text');
-                    var updateText = function (evn) {
-                        var value = string + '';
-                        editor.setValue(fromParent['value']);
+                    var ignore_change = false;
+                    doc.setValue(fromParent['value']);
+                    editor.on('beforeChange', function (editor, change) {
+                        if (ignore_change) {
+                            return;
+                        }
+                        var from = doc.indexFromPos(change.from);
+                        var to = doc.indexFromPos(change.to);
+                        if (to - from > 0){
+                            string.removeRange(from, to);
+                        }
+                        var text = change.text.join('\n');
+                        if (text.length) {
+                            string.insertString(from, text);
+                        }
+                    });
+                    editor.on('blur', function () {
                         receiveMessage({
                             'type' : 'setValue',
-                            'value' : value
+                            'value' : doc.getValue()
                         });
-                    };
-                    editor.on('change', function () {
-                        string.setText(editor.getValue());
                     });
-                    string.addEventListener(gapi.drive.realtime.EventType.TEXT_INSERTED, updateText);
-                    string.addEventListener(gapi.drive.realtime.EventType.TEXT_DELETED, updateText);
-                    updateText({});
+                    string.addEventListener(gapi.drive.realtime.EventType.TEXT_INSERTED, function (evn) {
+                        if (evn.isLocal) {
+                            return;
+                        }
+                        var from = doc.posFromIndex(evn.index);
+                        ignore_change = true;
+                        doc.replaceRange(evn.text, from, from);
+                        ignore_change = false;
+                    });
+                    string.addEventListener(gapi.drive.realtime.EventType.TEXT_DELETED, function (evn) {
+                        if (evn.isLocal) {
+                            return;
+                        }
+                        var from = doc.posFromIndex(evn.index);
+                        var to = doc.posFromIndex(evn.index + evn.text.length);
+                        ignore_change = true;
+                        doc.replaceRange("", from, to);
+                        ignore_change = false;
+                    });
                 },
                 'initializeModel' : function (model) {
-                    var string = model.createString(editor.getValue());
+                    var string = model.createString(fromParent['value']);
                     model.getRoot().set('text', string);
                 },
                 'updateHash' : function (hash) {

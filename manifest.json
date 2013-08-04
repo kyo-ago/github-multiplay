@@ -2,7 +2,7 @@
 	"name": "github-multiplay",
 	"description": "Google Drive Realtime API on github",
 	"manifest_version": 2,
-	"version": "0.1",
+	"version": "0.2",
     "icons": {
         "48": "/img/icon48.png"
     },

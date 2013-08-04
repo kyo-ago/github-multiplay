@@ -17,3 +17,12 @@ ToDo
 =======================
 
 Many bugfixes.
+
+Links
+=======================
+
+[What is Google Picker? - Google Picker — Google Developers](https://developers.google.com/picker/)
+
+[jonasfj/google-drive-realtime-examples](https://github.com/jonasfj/google-drive-realtime-examples)
+
+[CodeMirror Real-time Editor](http://jonasfj.github.io/google-drive-realtime-examples/)

@@ -1,6 +1,8 @@
 github-multiplay
 =======================
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/kyo-ago/github-multiplay.svg)](https://greenkeeper.io/)
+
 Google Drive Realtime API on github.
 
 Chrome Webstore
